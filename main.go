@@ -22,7 +22,7 @@ func main() {
 	logger = gologger.GetLogger(gologger.CONSOLE, gologger.ColoredLog)
 
 	token := os.Getenv("TGBOTTOKEN")
-	if token == "" {
+	if token == "" || token == "token" {
 		panic("you must set TGBOTTOKEN before starting")
 	}
 
