@@ -76,6 +76,5 @@ func (c *Chain) RandomSentence() string {
 		lastWord = possibleWords[selectedWord]
 	}
 	sentence = strings.Replace(sentence, " .", ".", -1)
-	sentence = strings.Title(sentence)
 	return sentence
 }
