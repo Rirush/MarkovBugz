@@ -7,6 +7,9 @@ import (
 
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/sadlil/gologger"
+	"io/ioutil"
+	"strings"
+	"regexp"
 )
 
 var (
@@ -14,10 +17,36 @@ var (
 )
 
 func main() {
-	s := "NO SAMPLE MATERIAL FOR CHAIN SPECIFIED"
+	s, err := ioutil.ReadFile("buglist")
+	if err != nil {
+		fmt.Errorf("cannot read source material, make sure you placed it in 'buglist' file\n %s", err)
+	}
+	cs := string(s)
+
+	regexpC := regexp.MustCompile(`(?:\[.+] |\[.+]: |\[.+]|\[.+]:)(.+)`)
+	regexpF := regexp.MustCompile(`(?:{.+} |{.+}|{.+] |{.+])(.+)`)
 
 	chain := NewChain()
-	chain.AddText(s)
+	sl := strings.Split(cs, "\n")
+	for _, line := range sl {
+		if line[0] == '[' {
+			r := regexpC.FindStringSubmatch(line)
+			line = r[1]
+		}
+		if line[0] == '{' {
+			r := regexpF.FindStringSubmatch(line)
+			line = r[1]
+		}
+		if len(line) > 3 {
+			if line[len(line)-1] == ' ' && line[len(line)-2] == ' ' {
+				line = line[:len(line)-2]
+			} else if line[len(line)-1] == ' ' {
+				line = line[:len(line)-1]
+			}
+			chain.AddSentence(strings.Split(line, " "))
+		}
+	}
+
 
 	logger = gologger.GetLogger(gologger.CONSOLE, gologger.ColoredLog)
 
